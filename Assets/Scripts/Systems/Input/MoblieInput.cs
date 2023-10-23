@@ -1,20 +1,26 @@
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
-[RequireComponent(typeof(DynamicJoystick))]
 public class MoblieInput : MonoBehaviour, IInput
 {
-    public event Action<Vector2> onInputChanged;
+    [SerializeField] private Joystick _joystick;
+    [SerializeField] private Button _fireButton;
 
-    private DynamicJoystick _joystick;
+    public event Action<Vector2> onMoveInput;
+    public event Action<Vector2> onFireInput;
 
-    private void Awake()
+    public void Init()
     {
-        _joystick = GetComponent<DynamicJoystick>();
+        _fireButton.onClick.AddListener(() => onFireInput?.Invoke(_joystick.Direction));
     }
-
     private void Update()
     {
-        onInputChanged?.Invoke(new Vector2(_joystick.Horizontal, _joystick.Vertical));
+        onMoveInput?.Invoke(new Vector2(_joystick.Horizontal, _joystick.Vertical));
+
+        if (Input.GetKey(KeyCode.S))
+        {
+            onFireInput?.Invoke(_joystick.Direction);
+        }
     }
 }

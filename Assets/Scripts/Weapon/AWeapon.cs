@@ -12,15 +12,20 @@ public abstract class AWeapon : MonoBehaviour
     [Tooltip("Weapon cooldown")]
     [Range(0f, 10f)]
     private float _cooldown;
+
+    [SerializeField]
+    [Tooltip("Target tag")]
+    private string _targetTag;
     #endregion
 
     public float Damage => _damage;
+    public string TargetTag => _targetTag;
     public bool CanAttack => currentCooldown <= 0;
 
 
     protected float currentCooldown;
 
-    public abstract void Attack(Transform target);
+    public abstract bool Attack(Transform target, Vector2 direction);
 
     protected virtual void Update()
     {

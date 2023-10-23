@@ -3,5 +3,13 @@ using UnityEngine;
 
 public interface IInput
 {
-    public event Action <Vector2> onInputChanged;
+    /// <summary>
+    /// Direction
+    /// </summary>
+    public event Action <Vector2> onMoveInput;
+
+    /// <summary>
+    /// Direction
+    /// </summary>
+    public event Action <Vector2> onFireInput;
 }

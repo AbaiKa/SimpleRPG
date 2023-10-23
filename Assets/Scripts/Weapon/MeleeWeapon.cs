@@ -27,16 +27,22 @@ public class MeleeWeapon : AWeapon
         _rigidbody.constraints = RigidbodyConstraints2D.FreezeAll;
     }
 
-    public override void Attack(Transform target)
+    public override bool Attack(Transform target, Vector2 direction)
     {
+        if (CanAttack == false)
+            return false;
+
         SetCooldown();
 
         Collider2D[] targets = Physics2D.OverlapCircleAll(transform.position, _radiusAttack, _maskAttack.value);
 
         for(int i = 0; i < targets.Length; i++)
         {
-            targets[i].GetComponent<HealthComponent>().TakeDamage(Damage);
+            if (targets[i].CompareTag(TargetTag))
+                targets[i].GetComponentInParent<HealthComponent>().TakeDamage(Damage);
         }
+
+        return true;
     }
 
     private void OnDrawGizmosSelected()

@@ -1,50 +1,97 @@
+using System.Collections;
 using UnityEngine;
 
-[RequireComponent(typeof(MoveComponent), typeof(RotationComponent), typeof(TargetTrackerComponent))]
 public class CommonEnemy : AEnemy
 {
-    protected MoveComponent moveComponent;
-    protected RotationComponent rotationComponent;
-    protected TargetTrackerComponent targetTracker;
+    [Header("Properties")]
+    [SerializeField] protected string walkAnimationTrigger;
+    [SerializeField] protected string deathAnimationTrigger;
+    [SerializeField] protected string attackAnimationTrigger;
 
-    protected override void Awake()
+    private bool _rotated = false;
+
+    #region Methods
+
+    #region Unity
+    private void Start()
     {
-        base.Awake();
+        attackComponent.onAttack += () => 
+        { 
+            animatorComponent.SetBool(attackAnimationTrigger, true);
+        };
 
-        moveComponent = GetComponent<MoveComponent>();
-        rotationComponent = GetComponent<RotationComponent>();
-        targetTracker = GetComponent<TargetTrackerComponent>();
-    }
-
-    protected override void Start()
-    {
-        attack.onAttack += animationComponent.PlayAttack;
-        healthComponent.onDead += animationComponent.PlayDead;
-    }
-
-    protected override void Update()
-    {
-        if (targetTracker.Target == null)
+        healthComponent.onDead += () =>
         {
-            animationComponent.PlayIdle();
+            animatorComponent.SetBool(deathAnimationTrigger, true);
+            StartDestroyRoutine();
+        };
+    }
+
+    private void Update()
+    {
+        if (!healthComponent.IsAlive)
+            return;
+
+        if (targetComponent.Target == null || attackComponent.onProcess)
+        {
+            ResetAnimation();
             return;
         }
 
-        if (attack.onProcess)
-        {
-            return;
-        }
+        Movement(targetComponent.Target);
+        Rotate(targetComponent.Target);
 
-        attack.TryAttack(targetTracker.Target);
-        moveComponent.Move(targetTracker.Target.position);
-        rotationComponent.Rotate(targetTracker.Target);
-
-        animationComponent.PlayWalk();
+        Attack(targetComponent.Target);
     }
 
     private void OnDestroy()
     {
-        attack.onAttack -= animationComponent.PlayAttack;
-        healthComponent.onDead -= animationComponent.PlayDead;
+        attackComponent.onAttack -= () =>
+        {
+            animatorComponent.SetBool(attackAnimationTrigger, true);
+        };
+
+        healthComponent.onDead -= () =>
+        {
+            animatorComponent.SetBool(deathAnimationTrigger, true);
+            StartDestroyRoutine();
+        };
     }
+    #endregion
+
+    #region Protected
+    protected override void Attack(Transform target)
+    {
+        attackComponent.TryAttack(target);
+    }
+
+    protected override void Movement(Transform target)
+    {
+        Vector2 a = transform.position;
+        Vector2 b = target.position;
+
+        transform.position = Vector2.MoveTowards(a, b, moveSpeed * Time.deltaTime);
+        animatorComponent.SetBool(walkAnimationTrigger, true);
+    }
+
+    protected void Rotate(Transform target)
+    {
+        float distance = target.position.x - transform.position.x;
+
+        if (_rotated == distance >= 0)
+            return;
+
+        Vector3 euler = new Vector3(0, distance >= 0 ? 0 : 180, 0);
+        transform.rotation = Quaternion.Euler(euler);
+        _rotated = distance >= 0;
+    }
+
+    protected void ResetAnimation()
+    {
+        animatorComponent.SetBool(walkAnimationTrigger, false);
+        animatorComponent.SetBool(attackAnimationTrigger, false);
+    }
+    #endregion
+
+    #endregion
 }

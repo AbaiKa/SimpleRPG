@@ -11,9 +11,14 @@ public class HealthComponent : MonoBehaviour, IDamagable
     #endregion
 
     public event Action onDead;
-    public event Action<float> onHealthChanged;
+    /// <summary>
+    /// 1 Current value |||
+    /// 2 Max value
+    /// </summary>
+    public event Action<float, float> onHealthChanged;
 
     public float Health { get; private set; }
+    public bool IsAlive => Health > 0f;
 
     private void Start()
     {
@@ -21,13 +26,24 @@ public class HealthComponent : MonoBehaviour, IDamagable
     }
     public void TakeDamage(float damage)
     {
-        if (Health <= 0f)
+        if (!IsAlive)
+        {
             return;
+        }
 
-        Health = Mathf.Max(Health - damage, 0);
-        onHealthChanged?.Invoke(Health);
+        Health -= damage;
+
+        onHealthChanged?.Invoke(Health, _health);
 
         if (Health <= 0f)
             onDead?.Invoke();
+    }
+
+    public void AddHp(float value)
+    {
+        if (Health == _health)
+            return;
+
+        Health = Mathf.Min(Health + value, _health);
     }
 }

@@ -9,14 +9,14 @@ TagManager:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - PlayerBody
   - Water
   - UI
   - Player
   - Enemy
-  - 
-  - 
-  - 
+  - Bullet
+  - EnemyBody
+  - Item
   - 
   - 
   - 
@@ -41,4 +41,19 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Environment
+    uniqueID: 2925852379
+    locked: 0
+  - name: Characters
+    uniqueID: 1532227575
+    locked: 0
+  - name: Weapon
+    uniqueID: 3486210145
+    locked: 0
+  - name: UI
+    uniqueID: 968657237
+    locked: 0
+  - name: PlayerRadius
+    uniqueID: 2732912017
     locked: 0

@@ -25,15 +25,11 @@ public class AttackComponent : MonoBehaviour
         if (target == null)
             return;
 
-        if (_currentWeapon == null || _currentWeapon.CanAttack == false)
-            return;
-
         if (SuitableDistance(target.position) == false)
             return;
 
-        _currentWeapon.Attack(target);
-
-        onAttack?.Invoke();
+        if (_currentWeapon.Attack(target, target.position))
+            onAttack?.Invoke();
     }
 
     private bool SuitableDistance(Vector2 target)
